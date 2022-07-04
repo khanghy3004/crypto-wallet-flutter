@@ -14,7 +14,7 @@ class TokenDetailsSection extends StatelessWidget {
 
   final BigInt tokenBalance;
   final WalletProvider _walletProvider;
-
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -89,10 +89,10 @@ class TokenDetailsSection extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  const Expanded(
+                                  Expanded(
                                     child: Text(
-                                      contractAddress,
-                                      style: TextStyle(
+                                      contractAddress[0],
+                                      style: const TextStyle(
                                         fontSize: 12.0,
                                         color: Colors.grey,
                                       ),
@@ -102,7 +102,7 @@ class TokenDetailsSection extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   InkWell(
                                     onTap: () => FlutterClipboard.copy(
-                                      contractAddress,
+                                      contractAddress[0],
                                     ),
                                     child: const Icon(
                                       Icons.copy,

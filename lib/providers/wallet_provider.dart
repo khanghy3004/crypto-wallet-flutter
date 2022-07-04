@@ -8,14 +8,14 @@ import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 
-const String contractAddress = '0x280b2e8b297e15467bc1929941b5439ec67fc145';
+List<String> contractAddress  = ['0x280b2e8b297e15467bc1929941b5439ec67fc145', '0xc56e3b597856333a2ccd37c4a77421da141ff3be'];
 
 final walletProvider = ChangeNotifierProvider((ref) => WalletProvider());
 
 class WalletProvider extends ChangeNotifier {
   late final Web3Client _web3client;
   late final Credentials _credentials;
-  late final DeployedContract _contract;
+  late DeployedContract _contract;
 
   // Contract RPC API
   ContractEvent _transferEvent() => _contract.event('Transfer');
@@ -44,7 +44,7 @@ class WalletProvider extends ChangeNotifier {
 
     await _initialiseClient();
     await _initialiseCredentials();
-    await _initialiseContract();
+    await initialiseContract();
     await refreshBalance();
 
     setBusy(false);
@@ -73,6 +73,10 @@ class WalletProvider extends ChangeNotifier {
       chainId: 97,
     );
     return txBlockHash;
+  }
+
+  Future<void> addToken(String address) async { 
+    contractAddress[0] = address;
   }
 
   void setBusy(bool val) {
@@ -106,11 +110,11 @@ class WalletProvider extends ChangeNotifier {
     await _updatePublicAddress();
   }
 
-  Future<void> _initialiseContract() async {
+  Future<void> initialiseContract() async {
     // Initialise Deployed Contract
     final abiString = await rootBundle.loadString('assets/abi/abi.json');
     final ContractAbi abi = ContractAbi.fromJson(abiString, 'BUSD');
-    _contract = DeployedContract(abi, EthereumAddress.fromHex(contractAddress));
+    _contract = DeployedContract(abi, EthereumAddress.fromHex(contractAddress[0]));
   }
 
   Future<void> _updatePublicAddress() async {

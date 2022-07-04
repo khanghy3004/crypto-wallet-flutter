@@ -5,6 +5,7 @@ import 'package:my_crypto_wallet/screens/transfer_page.dart';
 import 'package:my_crypto_wallet/screens/wallet_page_view_model.dart';
 import 'package:my_crypto_wallet/screens/widgets/eth_balance_section.dart';
 import 'package:my_crypto_wallet/screens/widgets/public_address_section.dart';
+import 'package:my_crypto_wallet/screens/widgets/token_balance_sectio.dart';
 import 'package:my_crypto_wallet/screens/widgets/token_details_section.dart';
 import 'package:my_crypto_wallet/screens/widgets/token_transfer_section.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,6 +22,8 @@ class _MyCryptoWalletState extends ConsumerState<MyCryptoWallet>
   late final WalletProvider _walletProvider;
   late final WalletPageViewModel _viewModel;
 
+  TextEditingController addressController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -33,8 +36,10 @@ class _MyCryptoWalletState extends ConsumerState<MyCryptoWallet>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Image.asset('assets/png/logo_deltalabs.png', fit: BoxFit.cover, height: 96),
-        title: const Text('Delta Wallet', style: TextStyle(color: Colors.black)),
+        leading: Image.asset('assets/png/logo_deltalabs.png',
+            fit: BoxFit.cover, height: 96),
+        title:
+            const Text('Delta Wallet', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
       ),
       body: Builder(
@@ -71,17 +76,77 @@ class _MyCryptoWalletState extends ConsumerState<MyCryptoWallet>
                               tokenBalance: tokenBalance,
                               walletProvider: _walletProvider,
                             ),
-                            // GestureDetector(
-                            //   onTap: () => Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (context) => const SecondRoute(),
-                            //     ),
-                            //   ),
-                            //   child: ETHBalanceSection(ethBalance: ethBalance),
-                            // ),
-                            ETHBalanceSection(ethBalance: ethBalance),
-                            const TokenTransferSection(),
+                            GestureDetector(
+                                onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SecondRoute(),
+                                      ),
+                                    ),
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child:
+                                      ETHBalanceSection(ethBalance: ethBalance),
+                                )),
+                                GestureDetector(
+                                onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SecondRoute(),
+                                      ),
+                                    ),
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child:
+                                      TokenBalanceSection(ethBalance: tokenBalance),
+                                )),
+                            const SizedBox(height: 10.0),
+                            Center(
+                              child: ElevatedButton(
+                                child: const Text("Import Token"),
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          scrollable: true,
+                                          title: const Text('Import Token'),
+                                          content: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Form(
+                                              child: Column(
+                                                children: <Widget>[
+                                                  TextFormField(
+                                                    controller: addressController,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: 'Address',
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          actions: [
+                                            Center(
+                                                child: ElevatedButton(
+                                                    child: const Text("Submit"),
+                                                    onPressed: () {
+                                                      // your code
+                                                      _walletProvider.addToken(addressController.text);
+                                                      _walletProvider.initialiseContract();
+                                                      _walletProvider.refreshBalance();
+                                                    }))
+                                          ],
+                                        );
+                                      });
+                                },
+                              ),
+                            )
+                            // ETHBalanceSection(ethBalance: ethBalance),
+                            // const TokenTransferSection(),
                           ],
                         );
                       },
