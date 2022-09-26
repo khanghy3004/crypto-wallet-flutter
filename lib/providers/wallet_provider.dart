@@ -1,6 +1,10 @@
+
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:math';
+import 'dart:developer' as developer;
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +20,7 @@ class WalletProvider extends ChangeNotifier {
   late final Web3Client _web3client;
   late final Credentials _credentials;
   late DeployedContract _contract;
+  late final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   // Contract RPC API
   ContractEvent _transferEvent() => _contract.event('Transfer');
@@ -77,6 +82,7 @@ class WalletProvider extends ChangeNotifier {
 
   Future<void> addToken(String address) async { 
     contractAddress[0] = address;
+    _prefs.then((prefs) => prefs.setString('contractAddress', address));
   }
 
   void setBusy(bool val) {
@@ -114,7 +120,10 @@ class WalletProvider extends ChangeNotifier {
     // Initialise Deployed Contract
     final abiString = await rootBundle.loadString('assets/abi/abi.json');
     final ContractAbi abi = ContractAbi.fromJson(abiString, 'BUSD');
-    _contract = DeployedContract(abi, EthereumAddress.fromHex(contractAddress[0]));
+    var pref = await _prefs;
+    String _contractAddress = pref.getString('contractAddress').toString().length == 42 ? pref.getString('contractAddress').toString() : contractAddress[0];
+    developer.log(pref.getString('contractAddress').toString().length.toString());
+    _contract = DeployedContract(abi, EthereumAddress.fromHex(_contractAddress));
   }
 
   Future<void> _updatePublicAddress() async {
